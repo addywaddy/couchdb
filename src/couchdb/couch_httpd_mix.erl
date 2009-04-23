@@ -72,7 +72,13 @@ handle_mix_req(#httpd{method='POST'}=Req, Db) ->
         query_ = {ViewQuery}
     } = parse_mix_settings_view(ViewProps),
     ViewArgs = lists:map(fun({Key, Value}) ->
-            {binary_to_list(Key), binary_to_list(Value)}
+            {binary_to_list(Key),
+              case Value of
+                true -> binary_to_list(<<"true">>);
+                false -> binary_to_list(<<"false">>);
+                _ -> ?JSON_ENCODE(Value)
+              end
+            }
          end,
          ViewQuery),
 
